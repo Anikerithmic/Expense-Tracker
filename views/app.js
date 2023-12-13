@@ -1,3 +1,4 @@
+
 const inputAmount = document.querySelector('#amount');
 const inputDescription = document.querySelector('#discription');
 const inputCategory = document.querySelector('#category');
@@ -53,12 +54,8 @@ function onSubmit(e) {
             .catch(err => {
                 console.log(err);
             });
-
-
-        // const expenseId = Date.now().toString(); 
     }
 }
-
 
 function deleteButton(expense, expenseItem) {
 
@@ -101,18 +98,10 @@ function editButton(expense, expenseItem) {
                 onUpdate(e, response.data);
                 expenseItem.remove();
                 
-                
-                
-
                 inputAmount.value = editExpense.amount;
                 inputDescription.value = editExpense.description;
                 inputCategory.value = editExpense.category;
-
-                // myForm.removeEventListener('submit', onSubmit);
-                // myForm.addEventListener('submit', onUpdate(e, editExpense));
-              
-
-                
+ 
             })
             .catch((err) => {
                 console.error('Error getting expense for edit:', err);
@@ -148,24 +137,6 @@ function showExpenses(expenses) {
                 editButton(expense, expenseItem, onUpdate);
         })
     }
-    // else if (expenses && typeof expenses === 'object') {
-    //     const expenseArray = expenses.allExpenses || [];
-    //     expenseArray.forEach((expense) => {
-    //         const expenseItem = document.createElement('li');
-
-    //         expenseItem.textContent =
-    //             expenseItem.username + ', ' +
-    //             expenseItem.contact + ',' +
-    //             expenseItem.email;
-
-    //         listItem.appendChild(expenseElement);
-    //         expenseList.appendChild(listItem);
-
-    //         deleteButton(expenses, expenseItem);
-    //         editButton(expenses, expenseItem);
-    //     });
-    // }
-
     clearInputs();
 }
 
