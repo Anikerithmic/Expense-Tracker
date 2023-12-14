@@ -1,23 +1,29 @@
 const Expense = require('../models/expense');
+const User = require('../models/user');
 const path = require('path');
 
 exports.signupPage = (req, res, next) => {
     res.sendFile(path.join(__dirname, '..', 'views', 'signup.html'));
 };
 
-exports.createUser = (req, res, next) => {
+exports.createUser = async (req, res, next) => {
     try {
         const username = req.body.username;
         const email = req.body.email;
         const password = req.body.password;
 
-        const userData = { username: username, email: email, password: password };
+        const existingUser = await User.findOne({ where: { email } });
+
+        if (existingUser) {
+           return res.status(400).json({ error: 'Email already in use' });
+        }
+
+        const userData = await User.create({ username: username, email: email, password: password });
         res.status(201).json({ newUserDetails: userData });
+
     } catch (err) {
-        console.log('Error creating user:', err)
-        res.status(500).json({
-            error: err
-        });
+        console.error('Error creating user:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 };
 

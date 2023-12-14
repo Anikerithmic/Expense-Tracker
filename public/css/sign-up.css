@@ -34,7 +34,7 @@ body {
 }
 
 .input-box {
-    margin-top: 0.2rem;
+    margin-top: 0.8rem;
     font-size: 0.875rem;
     line-height: 1.25rem;
 }
@@ -69,4 +69,8 @@ form button:hover{
     cursor: pointer;
     background-color: rgb(203, 198, 217);
 
+}
+#error-message {
+    color: rgb(152, 53, 53);
+    padding-top: 4px;
 }

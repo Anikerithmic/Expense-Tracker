@@ -3,7 +3,7 @@ const username = document.querySelector('#name');
 const email = document.querySelector('#email');
 const password = document.querySelector('#password');
 const signUpBtn = document.querySelector('#signup-Btn');
-
+const errorMessageContainer = document.querySelector('#error-message');
 signUpForm.addEventListener('submit', onSubmit);
 
 async function onSubmit(e) {
@@ -20,10 +20,15 @@ async function onSubmit(e) {
         const response = await axios.post("http://localhost:4000/user/signup", userData);
         console.log('Sign-Up successful:', response.data);
 
+        errorMessageContainer.textContent = '';
         clearInputs();
     }
     catch (err) {
-        console.log('Error during sign-up:', err);
+        if (err.response && err.response.data && err.response.data.error) {
+            errorMessageContainer.textContent = err.response.data.error;
+        } else {
+            console.log('Error during sign-up:', err);
+        }
     }
 }
 
