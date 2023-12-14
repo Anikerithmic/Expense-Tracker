@@ -27,6 +27,10 @@ exports.createUser = async (req, res, next) => {
     }
 };
 
+exports.getLogin = async (req, res, next) => {
+   res.sendFile(path.join(__dirname, '..', 'views', 'login.html'));
+}
+
 exports.createExpense = async (req, res, next) => {
     try {
         if (!req.body.amount) {
