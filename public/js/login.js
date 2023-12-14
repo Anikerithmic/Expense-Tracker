@@ -3,8 +3,10 @@ const email = document.querySelector('#email');
 const password = document.querySelector('#password');
 const loginBtn = document.querySelector('#login-Btn');
 const errorMessageContainer = document.querySelector('#error-message');
+const gotoSignup = document.querySelector('#goto-signup');
 
 loginForm.addEventListener('submit', onSubmit);
+gotoSignup.addEventListener('click', redirectToSignup);
 
 async function onSubmit(e) {
     e.preventDefault();
@@ -16,7 +18,7 @@ async function onSubmit(e) {
 
     try {
 
-        const response = await axios.post("http://localhost:4000/user/login", userData);
+        const response = await axios.post("http://localhost:4000/user/login-post", userData);
         console.log('Login successful:', response.data);
 
         errorMessageContainer.textContent = '';
@@ -29,6 +31,10 @@ async function onSubmit(e) {
             console.log('Error during login:', err);
         }
     }
+}
+
+function redirectToSignup() {
+    window.location.href = "http://localhost:4000/user/signup-page"; 
 }
 
 function clearInputs() {
