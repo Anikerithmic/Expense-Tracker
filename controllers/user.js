@@ -1,36 +1,44 @@
 const User = require('../models/user');
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 exports.getLogin = (req, res, next) => {
     res.sendFile(path.join(__dirname, '..', 'views', 'login.html'));
 }
 
-exports.postLogin = async (req, res, next) => {
+exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
         const existingUser = await User.findOne({ where: { email } });
 
         if (!existingUser) {
-            return res.status(401).json({ error: "User dosen't exists, Signup for new registration!" })
+            return res.status(401).json({ success: false, message: "User not exists!" })
         }
-        if (password !== existingUser.password) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        return res.status(200).json({ error: 'Login successful' });
-    }
-    catch (error) {
-        console.error('Error user login:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
 
+        bcrypt.compare(password, existingUser.password, (err, result) => {
+            if(err){
+               throw new Error('Something went wrong');
+            }
+            if (result === true) {
+                 res.status(200).json({ success: true, message: 'Login successful' });
+            }
+            else {
+               res.status(401).json({ success: false, message: 'Password incorrect' });
+            }
+        });
+    }
+    catch (err) {
+        console.error('Error user login:', err);
+        res.status(500).json({ success: false, error: err });
+    }
 };
 
-exports.signupPage = (req, res, next) => {
+exports.getSignup = (req, res, next) => {
     res.sendFile(path.join(__dirname, '..', 'views', 'signup.html'));
 };
 
-exports.createUser = async (req, res, next) => {
+exports.signup = async (req, res, next) => {
     try {
         const username = req.body.username;
         const email = req.body.email;
@@ -39,15 +47,18 @@ exports.createUser = async (req, res, next) => {
         const existingUser = await User.findOne({ where: { email } });
 
         if (existingUser) {
-            return res.status(400).json({ error: 'Email already in use' });
+            return res.status(400).json({ success: false, message: 'Email already in use' });
         }
-
-        const userData = await User.create({ username: username, email: email, password: password });
-        res.status(201).json({ newUserDetails: userData });
+        const saltrounds = 10;
+        bcrypt.hash(password, saltrounds, async (err, hash) => {
+            console.log(err);
+            const userData = await User.create({ username, email, password: hash });
+            res.status(201).json({ newUserDetails: userData });
+        })
 
     } catch (err) {
         console.error('Error creating user:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json(err);
     }
 };
 

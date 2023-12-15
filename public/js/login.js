@@ -18,15 +18,15 @@ async function onSubmit(e) {
 
     try {
 
-        const response = await axios.post("http://localhost:4000/user/login-post", userData);
+        const response = await axios.post("http://localhost:4000/user/login", userData);
         console.log('Login successful:', response.data);
 
         errorMessageContainer.textContent = '';
         clearInputs();
     }
     catch (err) {
-        if (err.response && err.response.data && err.response.data.error) {
-            errorMessageContainer.textContent = err.response.data.error;
+        if (err.response && err.response.data && err.response.data.message) {
+            errorMessageContainer.textContent = err.response.data.message;
         } else {
             console.log('Error during login:', err);
         }
@@ -34,7 +34,7 @@ async function onSubmit(e) {
 }
 
 function redirectToSignup() {
-    window.location.href = "http://localhost:4000/user/signup-page"; 
+    window.location.href = "http://localhost:4000/user/getSignup"; 
 }
 
 function clearInputs() {
