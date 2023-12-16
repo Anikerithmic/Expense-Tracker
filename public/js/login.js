@@ -20,6 +20,7 @@ async function onSubmit(e) {
 
         const response = await axios.post("http://localhost:4000/user/login", userData);
         console.log('Login successful:', response.data);
+        window.location.href = '../';
 
         errorMessageContainer.textContent = '';
         clearInputs();
