@@ -20,6 +20,9 @@ async function onSubmit(e) {
 
         const response = await axios.post("http://localhost:4000/user/login", userData);
         console.log('Login successful:', response.data);
+
+        alert(response.data.message);
+        localStorage.setItem('token', response.data.token);
         window.location.href = '../';
 
         errorMessageContainer.textContent = '';

@@ -20,12 +20,15 @@ async function onSubmit(e) {
         const response = await axios.post("http://localhost:4000/user/signup", userData);
         console.log('Sign-Up successful:', response.data);
 
+        alert(response.data.message);
+        window.location.href = './getLogin';
+
         errorMessageContainer.textContent = '';
         clearInputs();
     }
     catch (err) {
-        if (err.response && err.response.data && err.response.data.error) {
-            errorMessageContainer.textContent = err.response.data.error;
+        if (err.response && err.response.data && err.response.data.message) {
+            errorMessageContainer.textContent = err.response.data.message;
         } else {
             console.log('Error during sign-up:', err);
         }
