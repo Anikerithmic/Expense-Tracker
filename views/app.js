@@ -4,11 +4,14 @@ const inputDescription = document.querySelector('#discription');
 const inputCategory = document.querySelector('#category');
 const myForm = document.querySelector('#my-form');
 const expenseList = document.getElementById('expense-list');
+const buyPremiumBtn = document.querySelector('#rzp-btn');
 
 myForm.addEventListener('submit', onSubmit);
 
 window.addEventListener("DOMContentLoaded", () => {
-    axios.get("http://localhost:4000/get-expenses")
+
+    const token = localStorage.getItem('token');
+    axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
         .then(response => {
             console.log('Recieved Expenses:', response);
             showExpenses(response.data);
@@ -33,12 +36,13 @@ function onSubmit(e) {
             description,
             category
         };
+        const token = localStorage.getItem('token');
 
-        axios.post("http://localhost:4000/create-expense", expense)
+        axios.post("http://localhost:4000/create-expense", expense, { headers: { "Authorization": token } })
             .then(response => {
                 const responseData = response.data;
                 setTimeout(() => {
-                    axios.get("http://localhost:4000/get-expenses")
+                    axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
                         .then(response => {
                             console.log('Received Expenses:', response);
                             showExpenses(response.data);
@@ -64,11 +68,12 @@ function deleteButton(expense, expenseItem) {
     deleteBtn.textContent = 'Delete';
 
     deleteBtn.onclick = function () {
-        expenseItem.remove();
 
-        const apiUrl = `http://localhost:4000/delete-expense/${expense.id}`;
-        axios.delete(apiUrl)
+        const token = localStorage.getItem('token');
+
+        axios.delete(`http://localhost:4000/delete-expense/${expense.id}`, { headers: { "Authorization": token } })
             .then(response => {
+                expenseItem.remove();
                 console.log('Expense Deleted:', response.data);
             })
             .catch(err => {
@@ -92,16 +97,16 @@ function editButton(expense, expenseItem) {
         const apiUrl = `http://localhost:4000/edit-expense/${expense.id}`;
         axios.put(apiUrl, expense)
             .then((response) => {
-                
+
                 const editExpense = response.data;
                 console.log(editExpense);
                 onUpdate(e, response.data);
                 expenseItem.remove();
-                
+
                 inputAmount.value = editExpense.amount;
                 inputDescription.value = editExpense.description;
                 inputCategory.value = editExpense.category;
- 
+
             })
             .catch((err) => {
                 console.error('Error getting expense for edit:', err);
@@ -131,10 +136,10 @@ function showExpenses(expenses) {
             expenseItem.innerHTML =
                 `Rs.${expense.amount}/- | ${expense.description} | ${expense.category} `;
 
-                expenseList.appendChild(expenseItem);
+            expenseList.appendChild(expenseItem);
 
-                deleteButton(expense, expenseItem);
-                editButton(expense, expenseItem, onUpdate);
+            deleteButton(expense, expenseItem);
+            editButton(expense, expenseItem, onUpdate);
         })
     }
     clearInputs();
@@ -160,7 +165,7 @@ function onUpdate(e, editExpense) {
         axios.put(`http://localhost:4000/edit-expense/${id}`, expense)
             .then(response => {
                 const responseData = response.data;
-                console.log("newExpense:"+ responseData);
+                console.log("newExpense:" + responseData);
                 setTimeout(() => {
                     axios.get("http://localhost:4000/get-expenses")
                         .then(response => {
@@ -181,6 +186,41 @@ function onUpdate(e, editExpense) {
     }
 }
 
+buyPremiumBtn.onclick = async function (e) {
+    const token = localStorage.getItem('token');
+    const response = await axios.get('http://localhost:4000/purchase/premiumMembership', { headers: { "Authorization": token } })
+    console.log(response);
+    var options = {
+        "key": response.data.key_id,
+        "order_id": response.data.order.id,
+        "handler": async function (response) {
+            await axios.post('http://localhost:4000/purchase/updateTransactionStatus', {
+                order_id: options.order_id,
+                payment_id: response.razorpay_payment_id,
+            }, { headers: { "Authorization": token } });
+
+            alert('You Are Premium user now.');
+        }
+    };
+
+    const rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+
+    rzp1.on('payment.failed', async (response) => {
+        console.log(response);
+        alert('Something went wrong');
+        try {
+            const token = localStorage.getItem('token');
+            await axios.post('http://localhost:4000/purchase/updateTransactionStatus', {
+                order_id: options.order_id,
+                error_description: response.error.description
+            }, { headers: { "Authorization": token } });
+        } catch (error) {
+            console.error('Transaction Failed:', error);
+        }
+    });
+};
 
 function clearInputs() {
     inputAmount.value = '';

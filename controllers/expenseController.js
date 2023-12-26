@@ -4,13 +4,14 @@ const path = require('path');
 exports.createExpense = async (req, res, next) => {
     try {
         if (!req.body.amount) {
-            throw new Error('Anmount is Mandatory!');
+            throw new Error('Amount is Mandatory!');
         }
+
         const amount = req.body.amount;
         const description = req.body.description;
         const category = req.body.category;
 
-        const data = await Expense.create({ amount: amount, description: description, category: category });
+        const data = await Expense.create({ userId: req.user.id, amount: amount, description: description, category: category });
         res.status(201).json({ newExpenseDetails: data });
     } catch (err) {
         console.log('Error creating expense:', err)
@@ -22,7 +23,7 @@ exports.createExpense = async (req, res, next) => {
 
 exports.getExpenses = async (req, res, next) => {
     try {
-        const expenses = await Expense.findAll();
+        const expenses = await Expense.findAll({ where: { userId: req.user.id } });
         res.json(expenses);
     } catch (err) {
         console.error('Error fetching expenses:', err);
@@ -53,15 +54,23 @@ exports.deleteExpense = async (req, res, next) => {
         const expenseId = req.params.id;
         const expense = await Expense.findByPk(expenseId);
 
-        if (!expense) {
-            return res.status(404).json({ error: 'Expense not found!' });
+        if (expenseId == undefined || expenseId.length === 0) {
+            return res.status(400).json({ success: false });
         }
 
-        await expense.destroy();
-        res.status(200).json({ message: 'Expense deleted successfully' });
+        await Expense.destroy({ where: { userId: req.user.id } })
+            .then((noOfRows) => {
+                if (noOfRows == 0) {
+                    return res.status(404).json({ success: false, message: 'Expense does not belong to the user' });
+                }
+                else {
+
+                    return res.status(200).json({ message: 'Expense deleted successfully' });
+                }
+            })
     }
     catch (err) {
-        console.err('Error deleting expense:', err);
+        console.error('Error deleting expense:', err);
         res.status(500).json({ error: err });
     }
 }

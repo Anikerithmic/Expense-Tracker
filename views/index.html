@@ -14,9 +14,11 @@
 
 </head>
 
-<Header>
+<header class="d-flex justify-content-between align-items-center p-4">
     <h1>Expense Tracker</h1>
-</Header>
+    <button type="submit" id="rzp-btn" class="btn btn-primary ms-auto me-3">Buy Premium</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</header>
 <form action="" id="my-form">
     <div class="container">
         <div class="row">
@@ -38,7 +40,8 @@
                 </select>
             </div>
             <div class="col gy-4">
-                <button type="submit" class="btn btn-secondary">Add Expense</button>
+                <button type="submit" class="btn btn-dark">Add Expense</button>
+                
             </div>
         </div>
     </div>

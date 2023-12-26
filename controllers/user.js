@@ -2,6 +2,8 @@ const User = require('../models/user');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const secretKey = process.env.SECRET_KEY;
+
 
 exports.getLogin = (req, res, next) => {
     res.sendFile(path.join(__dirname, '..', 'views', 'login.html'));
@@ -22,7 +24,7 @@ exports.login = async (req, res, next) => {
                 return res.status(500).json({ success: false, message: 'Something went wrong' });
             }
             if (result === true) {
-                res.status(200).json({ success: true, message: 'User logged in successfully', token: generateAccessToken(existingUser.id) });
+                res.status(200).json({ success: true, message: 'User logged in successfully', token: generateAccessToken(existingUser.id, existingUser.username) });
             } else {
                 res.status(401).json({ success: false, message: 'Password incorrect' });
             }
@@ -31,6 +33,10 @@ exports.login = async (req, res, next) => {
         console.error('Error user login:', err);
         res.status(500).json({ success: false, error: err.message });
     }
+};
+
+exports.getSignup = (req, res, next) => {
+    res.sendFile(path.join(__dirname, '..', 'views', 'signup.html'));
 };
 
 exports.signup = async (req, res, next) => {
@@ -58,7 +64,10 @@ exports.signup = async (req, res, next) => {
     }
 };
 
-function generateAccessToken(id) {
-    const secretKey = 'gradient!7I'; 
-    return jwt.sign({ userId: id }, secretKey, { expiresIn: '1h' });
+function generateAccessToken(id, username) {
+    console.log('Secret Key:', secretKey);
+    
+    return jwt.sign({ userId: id , username: username}, secretKey);
 }
+
+
