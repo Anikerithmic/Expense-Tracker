@@ -1,4 +1,5 @@
 const Expense = require('../models/expense');
+const User = require('../models/user');
 const path = require('path');
 
 exports.createExpense = async (req, res, next) => {
@@ -24,7 +25,11 @@ exports.createExpense = async (req, res, next) => {
 exports.getExpenses = async (req, res, next) => {
     try {
         const expenses = await Expense.findAll({ where: { userId: req.user.id } });
-        res.json(expenses);
+        const isPremiumUser = await User.findOne({ where: {id: req.user.id, ispremiumuser: true}});
+        const userIsPremium = !!isPremiumUser;
+
+        res.json({expenses, userIsPremium});
+
     } catch (err) {
         console.error('Error fetching expenses:', err);
         res.status(500).json({ error: err.message });

@@ -8,17 +8,21 @@ const buyPremiumBtn = document.querySelector('#rzp-btn');
 
 myForm.addEventListener('submit', onSubmit);
 
-window.addEventListener("DOMContentLoaded", () => {
-
+window.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem('token');
-    axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
-        .then(response => {
-            console.log('Recieved Expenses:', response);
-            showExpenses(response.data);
-        })
-        .catch(err => {
-            console.log(err);
-        });
+
+    try {
+        const response = await axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
+        const { expenses, userIsPremium } = response.data;
+        if (userIsPremium) {
+            updateUIForPremiumUser();
+        }
+        console.log('Recieved Expenses:', response);
+        showExpenses(expenses);
+
+    } catch (err) {
+        console.error(err);
+    }
 });
 
 function onSubmit(e) {
@@ -200,6 +204,8 @@ buyPremiumBtn.onclick = async function (e) {
             }, { headers: { "Authorization": token } });
 
             alert('You Are Premium user now.');
+            window.location.href = './';
+
         }
     };
 
@@ -221,6 +227,49 @@ buyPremiumBtn.onclick = async function (e) {
         }
     });
 };
+
+function updateUIForPremiumUser() {
+    const buyPremiumBtn = document.querySelector('#rzp-btn');
+    buyPremiumBtn.style.display = 'none';
+
+    const premiumUserText = document.createElement('p');
+    premiumUserText.textContent = 'You are a Premium User!';
+    premiumUserText.classList.add('premium-user-text');
+
+    document.body.appendChild(premiumUserText);
+    showLeaderBoard();
+
+}
+
+function showLeaderBoard() {
+    const leaderBoardBtn = document.createElement('button');
+    leaderBoardBtn.textContent = 'Show LeaderBoard';
+    document.body.appendChild(leaderBoardBtn);
+
+    leaderBoardBtn.onclick = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            const userLeaderBoardArray = await axios.get('http://localhost:4000/premiumUser/getUserleaderBoard', { headers: { "Authorization": token } });
+            console.log(userLeaderBoardArray);
+
+            const leaderBoardElem = document.createElement('ul');
+            leaderBoardElem.innerHTML = '<h4>Leader Board:</h4>';
+
+            userLeaderBoardArray.data.forEach((userDetails) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Name: ${userDetails.name} | Total Expense: ${userDetails.totalExpense}`;
+                leaderBoardElem.appendChild(listItem);
+            });
+
+            document.body.appendChild(leaderBoardElem);
+
+        } catch (error) {
+            console.log('Failed Loading LeaderBoard data.', error);
+        }
+    };
+}
+
+
 
 function clearInputs() {
     inputAmount.value = '';
