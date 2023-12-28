@@ -243,6 +243,7 @@ function updateUIForPremiumUser() {
 
 function showLeaderBoard() {
     const leaderBoardBtn = document.createElement('button');
+    leaderBoardBtn.classList.add('btn', 'btn-dark', 'leaderboard-btn');
     leaderBoardBtn.textContent = 'Show LeaderBoard';
     document.body.appendChild(leaderBoardBtn);
 
@@ -251,13 +252,18 @@ function showLeaderBoard() {
         try {
             const userLeaderBoardArray = await axios.get('http://localhost:4000/premiumUser/getUserleaderBoard', { headers: { "Authorization": token } });
             console.log(userLeaderBoardArray);
+            userLeaderBoardArray.data.forEach((ele) => {
+                if (ele.totalExpense === null) {
+                    ele.totalExpense = 0;
+                }
+            });
 
             const leaderBoardElem = document.createElement('ul');
             leaderBoardElem.innerHTML = '<h4>Leader Board:</h4>';
 
             userLeaderBoardArray.data.forEach((userDetails) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Name: ${userDetails.name} | Total Expense: ${userDetails.totalExpense}`;
+                listItem.textContent = `Name: ${userDetails.username} | Total Expense: Rs.${userDetails.totalExpense}/-`;
                 leaderBoardElem.appendChild(listItem);
             });
 
@@ -268,8 +274,6 @@ function showLeaderBoard() {
         }
     };
 }
-
-
 
 function clearInputs() {
     inputAmount.value = '';
