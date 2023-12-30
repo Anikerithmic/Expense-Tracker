@@ -12,20 +12,26 @@ window.addEventListener("DOMContentLoaded", async () => {
     const token = localStorage.getItem('token');
 
     try {
-        const response = await axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
-        const { expenses, userIsPremium } = response.data;
-        if (userIsPremium) {
+        const response = await axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } });
+        const premiumUserResponse = await axios.get("http://localhost:4000/premiumUser/isPremiumUser", { headers: { "Authorization": token } });
+
+        const { expenses } = response.data;
+        const isPremiumUser = premiumUserResponse.data.isPremium;
+
+        if (isPremiumUser) {
+            showExpenses(expenses);
             updateUIForPremiumUser();
+        } else {
+            console.log('Received Expenses:', response);
+            showExpenses(expenses);
         }
-        console.log('Recieved Expenses:', response);
-        showExpenses(expenses);
 
     } catch (err) {
         console.error(err);
     }
 });
 
-function onSubmit(e) {
+async function onSubmit(e) {
     e.preventDefault();
 
     const amount = inputAmount.value;
@@ -41,27 +47,25 @@ function onSubmit(e) {
             category
         };
         const token = localStorage.getItem('token');
+        try {
+            const createExpenseResponse = await axios.post("http://localhost:4000/create-expense", expense, { headers: { "Authorization": token } });
+            const createdExpense = createExpenseResponse.data;
 
-        axios.post("http://localhost:4000/create-expense", expense, { headers: { "Authorization": token } })
-            .then(response => {
-                const responseData = response.data;
-                setTimeout(() => {
-                    axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } })
-                        .then(response => {
-                            console.log('Received Expenses:', response);
-                            showExpenses(response.data);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
-                }, 0);
+            const expensesResponse = await axios.get("http://localhost:4000/get-expenses", { headers: { "Authorization": token } });
+            const expenses = expensesResponse.data.expenses;
 
-                clearInputs();
-                console.log(response);
-            })
-            .catch(err => {
-                console.log(err);
-            });
+            showExpenses(expenses);
+
+            const isPremiumUserResponse = await axios.get("http://localhost:4000/premiumUser/isPremiumUser", { headers: { "Authorization": token } });
+            const isPremiumUser = isPremiumUserResponse.data.isPremium;
+
+            if (isPremiumUser) {
+                updateUIForPremiumUser();
+            }
+            clearInputs();
+        } catch (err) {
+            console.error('Error submitting expense:', err);
+        }
     }
 }
 
@@ -98,8 +102,9 @@ function editButton(expense, expenseItem) {
 
 
     editBtn.onclick = function (e) {
-        const apiUrl = `http://localhost:4000/edit-expense/${expense.id}`;
-        axios.put(apiUrl, expense)
+
+        const token = localStorage.getItem('token');
+        axios.put(`http://localhost:4000/edit-expense/${expense.id}`, expense, { headers: { "Authorization": token }} )
             .then((response) => {
 
                 const editExpense = response.data;
@@ -238,9 +243,7 @@ function updateUIForPremiumUser() {
 
     document.body.appendChild(premiumUserText);
     showLeaderBoard();
-
 }
-
 function showLeaderBoard() {
     const leaderBoardBtn = document.createElement('button');
     leaderBoardBtn.classList.add('btn', 'btn-dark', 'leaderboard-btn');
@@ -253,8 +256,8 @@ function showLeaderBoard() {
             const userLeaderBoardArray = await axios.get('http://localhost:4000/premiumUser/getUserleaderBoard', { headers: { "Authorization": token } });
             console.log(userLeaderBoardArray);
             userLeaderBoardArray.data.forEach((ele) => {
-                if (ele.totalExpense === null) {
-                    ele.totalExpense = 0;
+                if (ele.totalExpenses === null) {
+                    ele.totalExpenses = 0;
                 }
             });
 
@@ -263,7 +266,7 @@ function showLeaderBoard() {
 
             userLeaderBoardArray.data.forEach((userDetails) => {
                 const listItem = document.createElement('li');
-                listItem.textContent = `Name: ${userDetails.username} | Total Expense: Rs.${userDetails.totalExpense}/-`;
+                listItem.textContent = `Name: ${userDetails.username} | Total Expense: Rs.${userDetails.totalExpenses}/-`;
                 leaderBoardElem.appendChild(listItem);
             });
 

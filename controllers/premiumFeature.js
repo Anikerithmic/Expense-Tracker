@@ -4,22 +4,32 @@ const sequelize = require('../util/database');
 
 exports.getUserLeaderBoard = async (req, res) => {
     try {
-        const usersleaderBoard = await User.findAll({
-            attributes: ['id', 'username', [sequelize.fn('sum', sequelize.col('expenses.amount')), 'totalExpense']],
-            include: [
-                {
-                    model: Expense,
-                    attributes: []
-                }
-            ],
-            group: ['users.id'],
-            order: [['totalExpense', "DESC"]]
+        const usersLeaderBoard = await User.findAll({
+
+            order: [['totalExpenses', 'DESC']],
         });
-      
-        res.status(200).json(usersleaderBoard);
+
+        res.status(200).json(usersLeaderBoard);
 
     } catch (err) {
         console.error('Error in UserLeaderBoard:', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+exports.isPremiumUser = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        console.log("probo:",userId);
+        const user = await User.findByPk(userId);
+
+        if (user) {
+            const isPremium = user.ispremiumuser;
+            res.status(200).json({ isPremium });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (err) {
+        console.log('Error checking premium status:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
