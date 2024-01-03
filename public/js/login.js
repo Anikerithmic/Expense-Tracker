@@ -41,6 +41,10 @@ function redirectToSignup() {
     window.location.href = "http://localhost:4000/user/getSignup"; 
 }
 
+const forgotPassword = document.getElementById('forgotPassword');
+        forgotPassword.addEventListener('click',async ()=>{
+            window.location.href='/password/forgotpassword'
+        });
 function clearInputs() {
     email.value = '';
     password.value = '';

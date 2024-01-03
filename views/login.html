@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense-Tracker | Login</title>
     <link rel="stylesheet" href="/css/sign-up.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
 
     <div class="form-container">
         <p class="title">Login</p>
-        <form action="#" method="post" id="login-form">
+        <form id="login-form">
 
             <div class="input-box">
                 <label for="email">Email</label>
@@ -29,14 +30,15 @@
             </div>
 
             <button type="submit" id="signup-Btn">Login</button>
-
-            <p class="goto-text">New Registration?<button id="goto-signup" onclick="redirectToSignup()">Sign-Up</button></p>
+            <!-- <button id="forgot-Password-Btn" onclick="forgotpassword()"> Forgot password?</button> -->
+            <button class="forgot-Password-Btn" id="forgotPassword"> Forgot password?</button>
 
         </form>
+        <p class="goto-text">New Registration?<button id="goto-signup" onclick="redirectToSignup()">Sign-Up</button></p>
     </div>
 
     <script src="/js/login.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> -->
 </body>
 
 </html>

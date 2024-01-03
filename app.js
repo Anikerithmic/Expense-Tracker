@@ -8,9 +8,11 @@ const Expense = require('./models/expense');
 const Order = require('./models/orders');
 const purchaseRoute = require('./routes/purchase');
 const premiumFeatureRoute = require('./routes/premiumFeature');
+const PasswordRequest = require('./models/forgotpassword');
 
 const app = express();
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public')); 
 app.use(express.static('views')); 
 app.use(express.json());
@@ -24,6 +26,9 @@ Expense.belongsTo(User);
 
 User.hasMany(Order);
 Order.belongsTo(User);
+
+User.hasMany(PasswordRequest);
+PasswordRequest.belongsTo(User);
 
 sequelize
     .sync()
