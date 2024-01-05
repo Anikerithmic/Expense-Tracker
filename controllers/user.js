@@ -229,36 +229,3 @@ exports.updatePassword = async (req, res, next) => {
 };
 
 
-// exports.updatePassword = async (req, res, next) => {
-//     const newpassword = req.body.newpassword;
-//     const id = req.params.id;
-
-//     try {
-//         const responseOfUpdatePassword = await ForgotPasswordModel.findOne({ where: { id: id } });
-        
-//         if (responseOfUpdatePassword) {
-//             const user = await User.findOne({ where: { id: responseOfUpdatePassword.userId } });
-
-//             if (user) {
-//                 const saltRounds = 10;
-                
-//                 const hash = await bcrypt.hash(newpassword, saltRounds);
-
-//                 const updatingPassword = await User.update({ password: hash }, { where: { id: responseOfUpdatePassword.userId } });
-
-//                 if (updatingPassword) {
-//                     return res.status(201).json({ message: 'Successfully updated the new password' });
-//                 } else {
-//                     console.log('Error updating password');
-//                     res.status(500).json({ error: 'Error updating password' });
-//                 }
-//             } else {
-//                 console.log('User not found');
-//                 res.status(404).json({ error: 'User not found' });
-//             }
-//         }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Error updating password' });
-//     }
-// };
