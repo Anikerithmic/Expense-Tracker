@@ -7,7 +7,8 @@ const PasswordRequest = database.define('passwordrequest',{
         allowNull: false,
         primaryKey: true
     },
-    active: Sequelize.BOOLEAN,
+    active: Sequelize.BOOLEAN
+    // expiresby: Sequelize.DATE
 });
 
 

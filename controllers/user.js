@@ -80,9 +80,10 @@ exports.forgotPassword = async (req, res) => {
 }
 
 exports.forgotPasswordVerification = async (req, res, next) => {
-    const email = req.body.email;
+    const { email } =  req.body;
     try {
-        const user = await User.findOne({ email: email });
+     
+        const user = await User.findOne({where : { email }});
 
         if (user) {
             console.log('>>seeing if I am able to send the response');
@@ -133,6 +134,7 @@ exports.resettingPassword = async (req, res, next) => {
 
     try {
         const uid = uuid.v4();
+        
 
         var transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
@@ -183,73 +185,38 @@ exports.resettingPassword = async (req, res, next) => {
     }
 }
 
-// exports.updatePassword = async (req, res, next) => {
-//     const newpassword = req.body.newpassword;
-//     const id = req.params.id;
-
-//     try {
-//         const responseOfUpdatePassword = await ForgotPasswordModel.findOne({ where: { id: id } });
-
-//         console.log("obj res--->",responseOfUpdatePassword)
-//         if (responseOfUpdatePassword) {
-//             const user = await User.findOne({ where: { id: responseOfUpdatePassword.userId } });
-
-//             if (user) {
-//                 const saltRounds = 10;
-//                 bcrypt.genSalt(saltRounds, async (err, salt) => {
-//                     if (err) {
-//                         console.log(err);
-//                         throw new Error(err);
-//                     } else {
-//                         bcrypt.hash(newpassword, saltRounds, async (err, hash) => {
-//                             if (err) {
-//                                 console.log(err);
-//                                 throw new Error(err);
-//                             } else {
-//                                 const updatingPassword = await User.update({ password: hash }, { where: { id: responseOfUpdatePassword.userId } });
-
-//                                 if (updatingPassword) {
-//                                     return res.status(201).json({ message: 'Successfully updated the new password' });
-//                                 }
-//                             }
-//                         });
-//                     }
-//                 });
-//             } else {
-//                 console.log('User not found');
-//                 res.status(404).json({ error: 'User not found' });
-//             }
-//         }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: 'Error updating password' });
-//     }
-// };
-
-
 exports.updatePassword = async (req, res, next) => {
     const newpassword = req.body.newpassword;
     const id = req.params.id;
 
     try {
         const responseOfUpdatePassword = await ForgotPasswordModel.findOne({ where: { id: id } });
-        
+
+        console.log("obj res--->",responseOfUpdatePassword)
         if (responseOfUpdatePassword) {
             const user = await User.findOne({ where: { id: responseOfUpdatePassword.userId } });
 
             if (user) {
                 const saltRounds = 10;
-                
-                const hash = await bcrypt.hash(newpassword, saltRounds);
+                bcrypt.genSalt(saltRounds, async (err, salt) => {
+                    if (err) {
+                        console.log(err);
+                        throw new Error(err);
+                    } else {
+                        bcrypt.hash(newpassword, saltRounds, async (err, hash) => {
+                            if (err) {
+                                console.log(err);
+                                throw new Error(err);
+                            } else {
+                                const updatingPassword = await User.update({ password: hash }, { where: { id: responseOfUpdatePassword.userId } });
 
-                const updatingPassword = await User.update({ password: hash }, { where: { id: responseOfUpdatePassword.userId } });
-
-                if (updatingPassword) {
-                    return res.status(201).json({ message: 'Successfully updated the new password' });
-                } else {
-                    console.log('Error updating password');
-                    res.status(500).json({ error: 'Error updating password' });
-                }
+                                if (updatingPassword) {
+                                    return res.status(201).json({ message: 'Successfully updated the new password' });
+                                }
+                            }
+                        });
+                    }
+                });
             } else {
                 console.log('User not found');
                 res.status(404).json({ error: 'User not found' });
@@ -260,3 +227,38 @@ exports.updatePassword = async (req, res, next) => {
         res.status(500).json({ error: 'Error updating password' });
     }
 };
+
+
+// exports.updatePassword = async (req, res, next) => {
+//     const newpassword = req.body.newpassword;
+//     const id = req.params.id;
+
+//     try {
+//         const responseOfUpdatePassword = await ForgotPasswordModel.findOne({ where: { id: id } });
+        
+//         if (responseOfUpdatePassword) {
+//             const user = await User.findOne({ where: { id: responseOfUpdatePassword.userId } });
+
+//             if (user) {
+//                 const saltRounds = 10;
+                
+//                 const hash = await bcrypt.hash(newpassword, saltRounds);
+
+//                 const updatingPassword = await User.update({ password: hash }, { where: { id: responseOfUpdatePassword.userId } });
+
+//                 if (updatingPassword) {
+//                     return res.status(201).json({ message: 'Successfully updated the new password' });
+//                 } else {
+//                     console.log('Error updating password');
+//                     res.status(500).json({ error: 'Error updating password' });
+//                 }
+//             } else {
+//                 console.log('User not found');
+//                 res.status(404).json({ error: 'User not found' });
+//             }
+//         }
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: 'Error updating password' });
+//     }
+// };
