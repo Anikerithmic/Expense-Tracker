@@ -59,7 +59,7 @@ exports.createExpense = async (req, res, next) => {
     };
 };
 
-// Updated getExpenses function to support pagination
+// Updated getExpenses function which support pagination
 exports.getExpenses = async (req, res, next) => {
     try {
         const page = req.query.page || 1; // Default to page 1 if not specified
@@ -73,6 +73,7 @@ exports.getExpenses = async (req, res, next) => {
         });
 
         const totalPages = Math.ceil(count / pageSize);
+        console.log("totalPages:", totalPages);
 
         res.json({ expenses, totalPages, currentPage: parseInt(page) });
     } catch (err) {
@@ -80,18 +81,6 @@ exports.getExpenses = async (req, res, next) => {
         res.status(500).json({ error: err.message });
     }
 };
-
-
-// exports.getExpenses = async (req, res, next) => {
-//     try {
-//         const expenses = await Expense.findAll({ where: { userId: req.user.id } });
-//         res.json({ expenses });
-
-//     } catch (err) {
-//         console.error('Error fetching expenses:', err);
-//         res.status(500).json({ error: err.message });
-//     }
-// };
 
 exports.editExpense = async (req, res, next) => {
     try {

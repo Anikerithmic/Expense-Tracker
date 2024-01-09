@@ -4,6 +4,8 @@ const inputCategory = document.querySelector('#category');
 const myForm = document.querySelector('#my-form');
 const expenseList = document.getElementById('expense-list');
 const buyPremiumBtn = document.querySelector('#rzp-btn');
+const displayCountSelect = document.getElementById('displayCount');
+
 
 myForm.addEventListener('submit', onSubmit);
 buyPremiumBtn.addEventListener('click', buyPremium);
@@ -23,15 +25,14 @@ async function initializeApp() {
         const currentPage = expensesResponse.data.currentPage;
         const isPremiumUser = premiumUserResponse.data.isPremium;
 
-        showExpenses(expenses);
-
         if (isPremiumUser) {
             updateUIForPremiumUser();
             downloadBtn();
         }
 
         displayPaginationControls(currentPage, totalPages);
-        await fetchAndDisplayPage(totalPages);
+        initializeDisplayCount();
+        showExpenses(expenses);
 
     } catch (error) {
         console.error(error);
@@ -53,13 +54,29 @@ function displayPaginationControls(currentPage, totalPages) {
         nextButton.addEventListener('click', () => fetchAndDisplayPage(currentPage + 1));
 
         const pageInfo = document.createElement('span');
-        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        pageInfo.textContent = ` Page ${currentPage} of ${totalPages} `;
 
         paginationContainer.appendChild(prevButton);
         paginationContainer.appendChild(pageInfo);
         paginationContainer.appendChild(nextButton);
     }
 }
+
+function initializeDisplayCount() {
+    let displayCount = parseInt(localStorage.getItem('displayCount')) || 10; // Default to 10 if not set in local storage
+
+    displayCountSelect.value = displayCount;
+    displayCountSelect.addEventListener('change', updateDisplayCount);
+}
+
+
+function updateDisplayCount() {
+    let displayCount = parseInt(displayCountSelect.value);
+    localStorage.setItem('displayCount', displayCount);
+    fetchAndDisplayPage(1);
+};
+
+
 
 async function fetchAndDisplayPage(page) {
     try {
@@ -70,14 +87,21 @@ async function fetchAndDisplayPage(page) {
         const totalPages = response.data.totalPages;
         const currentPage = response.data.currentPage;
 
-        showExpenses(expenses);
+        const userDisplayCount = parseInt(localStorage.getItem('displayCount')) || 20;
 
-        displayPaginationControls(currentPage, totalPages);
+        showExpenses(expenses.slice(0, userDisplayCount));
+
+        displayPaginationControls(currentPage, totalPages)
+
+        if (currentPage > totalPages) {
+            fetchAndDisplayPage(totalPages);
+        }
 
     } catch (error) {
         console.error('Error fetching and displaying page:', error);
     }
 }
+
 
 
 async function onSubmit(e) {
@@ -297,8 +321,7 @@ function downloadBtn() {
     }
 }
 
- async function downloadExpenses(e) {
-    // e.preventDefault();
+ async function downloadExpenses() {
     const token = localStorage.getItem('token');
     try {
         const downloadExpenses = await axios.get('http://localhost:4000/user/download', { headers: { "Authorization": token } });
