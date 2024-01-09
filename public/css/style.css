@@ -1,3 +1,8 @@
+
+.expenseItem-btn {
+    position: absolute;
+    right: 10px;
+}
 .premium-user-text {
     position: fixed;
     top: 0;
@@ -17,4 +22,20 @@
     top: 92px;
     right: 20px;
     margin: 10px;
+}
+.expense-container {
+    position: relative;
+    width: 50%;
+    left: 100px;
+
+}
+#user-leaderboard {
+    position: absolute;
+    top: 28%;
+    right: 270px;
+    padding: 10px;
+}
+
+li{
+    margin: 20px 0px;
 }

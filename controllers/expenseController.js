@@ -18,7 +18,7 @@ exports.downloadExpense = async (req, res) => {
     }
     catch (err) {
         console.error('Error processing downloadExpense:', err);
-        res.status(500).json({ fileURL: '', success: false, error: err });
+        res.status(500).json({ fileURL: '', success: false, error: err });  
     }
 };
 
@@ -59,16 +59,39 @@ exports.createExpense = async (req, res, next) => {
     };
 };
 
+// Updated getExpenses function to support pagination
 exports.getExpenses = async (req, res, next) => {
     try {
-        const expenses = await Expense.findAll({ where: { userId: req.user.id } });
-        res.json({ expenses });
+        const page = req.query.page || 1; // Default to page 1 if not specified
+        const pageSize = 10;
+        const offset = (page - 1) * pageSize;
 
+        const { count, rows: expenses } = await Expense.findAndCountAll({
+            where: { userId: req.user.id },
+            limit: pageSize,
+            offset: offset,
+        });
+
+        const totalPages = Math.ceil(count / pageSize);
+
+        res.json({ expenses, totalPages, currentPage: parseInt(page) });
     } catch (err) {
         console.error('Error fetching expenses:', err);
         res.status(500).json({ error: err.message });
     }
 };
+
+
+// exports.getExpenses = async (req, res, next) => {
+//     try {
+//         const expenses = await Expense.findAll({ where: { userId: req.user.id } });
+//         res.json({ expenses });
+
+//     } catch (err) {
+//         console.error('Error fetching expenses:', err);
+//         res.status(500).json({ error: err.message });
+//     }
+// };
 
 exports.editExpense = async (req, res, next) => {
     try {

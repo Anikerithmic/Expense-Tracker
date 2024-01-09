@@ -19,6 +19,8 @@ async function initializeApp() {
         ]);
 
         const expenses = expensesResponse.data.expenses;
+        const totalPages = expensesResponse.data.totalPages;
+        const currentPage = expensesResponse.data.currentPage;
         const isPremiumUser = premiumUserResponse.data.isPremium;
 
         showExpenses(expenses);
@@ -27,10 +29,56 @@ async function initializeApp() {
             updateUIForPremiumUser();
             downloadBtn();
         }
+
+        displayPaginationControls(currentPage, totalPages);
+        await fetchAndDisplayPage(totalPages);
+
     } catch (error) {
         console.error(error);
     }
 }
+
+function displayPaginationControls(currentPage, totalPages) {
+    const paginationContainer = document.getElementById('pagination-container');
+
+    paginationContainer.innerHTML = '';
+
+    if (totalPages > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.addEventListener('click', () => fetchAndDisplayPage(currentPage - 1));
+
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.addEventListener('click', () => fetchAndDisplayPage(currentPage + 1));
+
+        const pageInfo = document.createElement('span');
+        pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+        paginationContainer.appendChild(prevButton);
+        paginationContainer.appendChild(pageInfo);
+        paginationContainer.appendChild(nextButton);
+    }
+}
+
+async function fetchAndDisplayPage(page) {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:4000/get-expenses?page=${page}`, { headers: { "Authorization": token } });
+
+        const expenses = response.data.expenses;
+        const totalPages = response.data.totalPages;
+        const currentPage = response.data.currentPage;
+
+        showExpenses(expenses);
+
+        displayPaginationControls(currentPage, totalPages);
+
+    } catch (error) {
+        console.error('Error fetching and displaying page:', error);
+    }
+}
+
 
 async function onSubmit(e) {
     e.preventDefault();
@@ -55,7 +103,7 @@ async function onSubmit(e) {
             const expenses = expensesResponse.data.expenses;
             const isPremiumUser = isPremiumUserResponse.data.isPremium;
 
-            showExpenses(expenses);
+            showExpenses(expenses); 
 
             if (isPremiumUser) {
                 updateUIForPremiumUser();
@@ -70,8 +118,8 @@ async function onSubmit(e) {
 function deleteButton(expense, expenseItem) {
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = 'Delete';
-    deleteBtn.classList.add('btn', 'btn-dark');
-    deleteBtn.style.marginInline = '10px';
+    deleteBtn.classList.add('btn', 'btn-dark', 'expenseItem-btn');
+    deleteBtn.style.marginInline = '70px';
     deleteBtn.addEventListener('click', () => deleteExpense(expense.id, expenseItem));
     expenseItem.appendChild(deleteBtn);
 }
@@ -90,7 +138,7 @@ async function deleteExpense(expenseId, expenseItem) {
 function editButton(expense, expenseItem) {
     const editBtn = document.createElement('button');
     editBtn.textContent = 'Edit';
-    editBtn.classList.add('btn', 'btn-dark');
+    editBtn.classList.add('btn', 'btn-dark', 'expenseItem-btn');
     editBtn.addEventListener('click', () => editExpense(expense.id));
     expenseItem.appendChild(editBtn);
 }
@@ -202,8 +250,9 @@ function updateUIForPremiumUser() {
 }
 
 function showLeaderBoard() {
+    const leaderboardContainer = document.getElementById('user-leaderboard');
     const leaderBoardBtn = document.querySelector('.leaderboard-btn');
-    if (!leaderBoardBtn) {
+    if (leaderboardContainer && !leaderBoardBtn) {
         const leaderBoardBtn = document.createElement('button');
         leaderBoardBtn.classList.add('btn', 'btn-dark', 'leaderboard-btn');
         leaderBoardBtn.textContent = 'Show LeaderBoard';
@@ -229,7 +278,7 @@ function showLeaderBoard() {
                     leaderBoardElem.appendChild(listItem);
                 });
 
-                document.body.appendChild(leaderBoardElem);
+                leaderboardContainer.appendChild(leaderBoardElem);
             } catch (error) {
                 console.log('Failed Loading LeaderBoard data.', error);
             }

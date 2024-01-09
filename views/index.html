@@ -19,46 +19,52 @@
 
 <body>
 
-<header class="d-flex justify-content-between align-items-center p-4">
-    <h1>Expense Tracker</h1>
-    <button type="submit" id="rzp-btn" class="btn btn-primary ms-auto me-3">Buy Premium</button>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-</header>
-<form action="" id="my-form">
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <label for="amount">Choose Expense Amount</label>
-                <input type="number" name="" id="amount">
-            </div>
-            <div class="col">
-                <label for="amount">Discription</label><br>
-                <input type="text" name="" id="discription">
-            </div>
-            <div class="col">
-                <label for="category">Category</label>
-                <select class="form-select" id="category">
-                    <option selected>Open this select menu</option>
-                    <option value="Fuel">Fuel</option>
-                    <option value="Electricity">Electricity</option>
-                    <option value="Movie">Movie</option>
-                </select>
-            </div>
-            <div class="col gy-4">
-                <button type="submit" class="btn btn-dark">Add Expense</button>
+    <header class="d-flex justify-content-between align-items-center p-4">
+        <h1>Expense Tracker</h1>
+        <button type="submit" id="rzp-btn" class="btn btn-primary ms-auto me-3">Buy Premium</button>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    </header>
+    <form action="" id="my-form">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <label for="amount">Choose Expense Amount</label>
+                    <input type="number" name="" id="amount">
+                </div>
+                <div class="col">
+                    <label for="amount">Discription</label><br>
+                    <input type="text" name="" id="discription">
+                </div>
+                <div class="col">
+                    <label for="category">Category</label>
+                    <select class="form-select" id="category">
+                        <option selected>Open this select menu</option>
+                        <option value="Fuel">Fuel</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Movie">Movie</option>
+                    </select>
+                </div>
+                <div class="col gy-4">
+                    <button type="submit" class="btn btn-dark">Add Expense</button>
 
+                </div>
             </div>
         </div>
+    </form>
+
+    <div class="expense-container">
+        <h6>Expenses :</h6>
+        <ol id="expense-list">
+
+        </ol>
+
+        <div id="pagination-container"></div>
     </div>
-</form>
 
-<div class="container">
-    <h6>Expenses :</h6>
-    <ol id="expense-list">
+    <div id="user-leaderboard">
 
-    </ol>
-</div>
-</div>
+    </div>
+
 
 
 
