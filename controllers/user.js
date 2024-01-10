@@ -86,7 +86,6 @@ exports.forgotPasswordVerification = async (req, res, next) => {
         const user = await User.findOne({where : { email }});
 
         if (user) {
-            console.log('>>seeing if I am able to send the response');
             return res.status(200).json({ success: true });
         } else {
             res.status(401).json({ error: "User is unauthorized" });
@@ -192,7 +191,6 @@ exports.updatePassword = async (req, res, next) => {
     try {
         const responseOfUpdatePassword = await ForgotPasswordModel.findOne({ where: { id: id } });
 
-        console.log("obj res--->",responseOfUpdatePassword)
         if (responseOfUpdatePassword) {
             const user = await User.findOne({ where: { id: responseOfUpdatePassword.userId } });
 

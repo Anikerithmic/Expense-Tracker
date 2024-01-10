@@ -19,7 +19,6 @@ exports.getUserLeaderBoard = async (req, res) => {
 exports.isPremiumUser = async (req, res) => {
     try {
         const userId = req.user.id;
-        console.log("probo:",userId);
         const user = await User.findByPk(userId);
 
         if (user) {

@@ -8,7 +8,6 @@ const S3Service = require('../services/S3services');
 exports.downloadExpense = async (req, res) => {
     try {
         const expenses = await UserServices.getExpenses(req);
-        console.log(expenses);
         const stringifiedExpenses = JSON.stringify(expenses);
         // It should depend upon the userId 
         const userId = req.user.id;
@@ -41,7 +40,6 @@ exports.createExpense = async (req, res, next) => {
 
         }, { transaction: t });
         const totalExpenses = Number(req.user.totalExpenses) + Number(amount);
-        console.log(totalExpenses);
         const updatedUser = await User.update({ totalExpenses: totalExpenses }, { where: { id: req.user.id }, transaction: t });
 
         if (!updatedUser) {
@@ -73,7 +71,6 @@ exports.getExpenses = async (req, res, next) => {
         });
 
         const totalPages = Math.ceil(count / pageSize);
-        console.log("totalPages:", totalPages);
 
         res.json({ expenses, totalPages, currentPage: parseInt(page) });
     } catch (err) {
@@ -85,7 +82,6 @@ exports.getExpenses = async (req, res, next) => {
 exports.editExpense = async (req, res, next) => {
     try {
         const expenseId = req.params.id;
-        console.log('Received request for edit with ID:', expenseId);
         const expense = await Expense.findByPk(expenseId);
 
         if (!expense) {
