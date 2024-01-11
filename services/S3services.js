@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 
 
 exports.uploadToS3 = async (data, filename) => {
-    const BUCKET_NAME = "expense-trackingapp";
+    const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
     const IAM_USER_KEY = process.env.AWS_ACCESS_KEY;
     const IAM_USER_SECRET = process.env.AWS_SECRET_ACCESS_KEY;
 
